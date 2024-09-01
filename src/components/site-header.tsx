@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Crop, FileDigit } from "lucide-react";
+import { Bird } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ModeToggle } from "./mode-toggle";
 import { metadata } from "@/lib/constants";
@@ -14,7 +14,7 @@ export default function SiteHeader() {
           className="flex mr-6 text-primary items-center"
           prefetch={false}
         >
-          <Crop className="h-6 w-6 text-muted-foreground md:text-primary" />
+          <Bird className="h-6 w-6 text-muted-foreground md:text-primary" />
           <span className="ml-4 font-semibold text-base sm:text-lg ">
             {title}
           </span>
