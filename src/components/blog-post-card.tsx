@@ -1,88 +1,64 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import Link from "next/link";
+import { Alert } from "@/components/ui/alert";
+import Link from "next/dist/client/link";
+import { Badge } from "./ui/badge";
 
 type BlogPostProps = {
   post: {
     id: string;
-    fields: Record<string, any>;
+    fields: {
+      GUID: string;
+      content: string;
+      creator: string;
+      imgURL: string;
+      link: string;
+      pubDate: string;
+      title: string;
+      source: string;
+    };
   };
 };
 
-async function getUnsplashImage(keyword: string): Promise<string> {
-  const unsplashAccessKey = process.env.UNSPLASH_ACCESS_KEY;
-
-  if (!unsplashAccessKey) {
-    console.error("Unsplash API key is not configured");
-    return "https://source.unsplash.com/random";
-  }
-
-  try {
-    const response = await fetch(
-      `https://api.unsplash.com/photos/random?query=${encodeURIComponent(
-        keyword
-      )}&client_id=${unsplashAccessKey}`
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch image from Unsplash");
-    }
-
-    const data = await response.json();
-    return data.urls.regular;
-  } catch (error) {
-    console.error("Error fetching image from Unsplash:", error);
-    return "https://source.unsplash.com/random";
-  }
-}
-
-export default async function BlogPostCard({ post }: BlogPostProps) {
-  const keywords = JSON.parse(post.fields.Keywords || "[]");
-  const firstKeyword = keywords[0] || "blog";
-  const imageUrl = await getUnsplashImage(firstKeyword);
+export default function BlogPostCard({ post }: BlogPostProps) {
+  const { fields } = post;
 
   return (
-    <div>
-      <div className="flex flex-row justify-between mx-2 my-3">
-        <p className="text-sm text-muted-foreground">{post.fields.Source}</p>
-        <p className="text-sm text-muted-foreground ">
-          {format(new Date(post.fields.Date), "MMM dd yyyy")}
-        </p>
+    <Alert className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[100px_1fr_300px] gap-4 border-none">
+      <div className="hidden lg:block text-sm text-muted-foreground">
+        {format(new Date(fields.pubDate), "MMM d, yyyy")}
       </div>
-      <Card className="flex flex-col h-full overflow-hidden">
-        <CardHeader className="relative p-0 overflow-hidden h-48">
-          <img
-            src={imageUrl}
-            alt={post.fields.Title}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        </CardHeader>
-        <CardContent className="flex-grow mt-4">
-          <h3 className="text-2xl font-semibold leading-snug tracking-wide">
-            {post.fields.Title}
-          </h3>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {keywords.map((keyword: string, index: number) => (
-              <Badge key={index} variant="secondary">
-                {keyword.charAt(0).toUpperCase() + keyword.slice(1)}
-              </Badge>
-            ))}
+      <div className=" max-w-lg">
+        <div className="flex justify-between items-center">
+          <Badge variant="outline" className="mb-2 py-2">
+            {fields.source}
+          </Badge>
+          <div className="text-sm text-muted-foreground sm:hidden">
+            {format(new Date(fields.pubDate), "MMM d, yyyy")}
           </div>
-        </CardContent>
-        <CardFooter className="justify-end">
-          <Link href={`/${post.id}`}>
-            <Button variant="secondary">Read more</Button>
-          </Link>
-        </CardFooter>
-      </Card>
-    </div>
+        </div>
+        <img
+          src={fields.imgURL}
+          alt={fields.title}
+          className="w-full h-auto mb-1 rounded-md sm:hidden"
+        />
+        <Link href={fields.link} className="hover:underline">
+          <h2 className="text-2xl font-bold mb-2">{fields.title}</h2>
+        </Link>
+        <p className="text-base mb-2">{fields.content}</p>
+        {fields.creator && (
+          <p className="text-sm text-muted-foreground">By {fields.creator}</p>
+        )}
+      </div>
+      <div className="hidden sm:block">
+        <div className="flex lg:hidden justify-end text-sm text-muted-foreground mb-4 mt-3">
+          {format(new Date(fields.pubDate), "MMM d, yyyy")}
+        </div>
+        <img
+          src={fields.imgURL}
+          alt={fields.title}
+          className="w-full h-auto mb-1 rounded-md"
+        />
+      </div>
+    </Alert>
   );
 }

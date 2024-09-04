@@ -3,11 +3,21 @@ import SiteFooter from "@/components/site-footer";
 import BlogPostCard from "@/components/blog-post-card";
 import { Bird } from "lucide-react";
 import SubscribeForm from "@/components/subscribe-form";
+import { Separator } from "@/components/ui/separator";
 
 // Define the type for our blog post
 type BlogPost = {
   id: string;
-  fields: Record<string, any>;
+  fields: {
+    GUID: string;
+    content: string;
+    creator: string;
+    imgURL: string;
+    link: string;
+    pubDate: string;
+    title: string;
+    source: string;
+  };
 };
 
 async function getBlogPosts(): Promise<BlogPost[]> {
@@ -18,10 +28,11 @@ async function getBlogPosts(): Promise<BlogPost[]> {
 
   return new Promise((resolve, reject) => {
     const posts: BlogPost[] = [];
-    base("News")
+    base("RSS")
       .select({
         pageSize: 12,
         view: "Grid view",
+        sort: [{ field: "pubDate", direction: "desc" }],
       })
       .eachPage(
         function page(records: any, fetchNextPage: any) {
@@ -62,9 +73,12 @@ export default async function Home() {
           <SubscribeForm />
         </section>
         <section className="flex flex-col w-full items-center px-5 py-[5rem]">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-16">
+          <div className="grid grid-cols-1 gap-4">
             {blogPosts.map((post) => (
-              <BlogPostCard key={post.id} post={post} />
+              <>
+                <BlogPostCard key={post.id} post={post} />
+                <Separator className="w-full" />
+              </>
             ))}
           </div>
         </section>
