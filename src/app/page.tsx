@@ -1,7 +1,7 @@
 import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
 import BlogPostCard from "@/components/blog-post-card";
-import { Bird } from "lucide-react";
+import { Bird, FileText, Rss, RssIcon, Search } from "lucide-react";
 import SubscribeForm from "@/components/subscribe-form";
 import { Separator } from "@/components/ui/separator";
 
@@ -17,10 +17,13 @@ type BlogPost = {
     pubDate: string;
     title: string;
     source: string;
+    rssID: string;
   };
 };
 
 async function getBlogPosts(): Promise<BlogPost[]> {
+  console.log("Getting blog posts");
+
   const Airtable = require("airtable");
   const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
     "appSMEQ0b0QCb3Gi0"
@@ -66,16 +69,19 @@ export default async function Home() {
       <div>
         <section className="flex flex-col w-full items-center px-5 py-[5rem] gap-4">
           <Bird className="w-16 h-16" />
-          <h1 className="text-4xl font-bold">AI News on the Cheap</h1>
+          <h1 className="text-4xl font-bold">AI News on the Cheep</h1>
           <p className="text-lg mb-3">
             Your source for AI News summarized by ChatGPT 4o Mini
           </p>
+
           <SubscribeForm />
         </section>
+        <Separator className="w-full" />
         <section className="flex flex-col w-full items-center px-5 py-[5rem]">
           <div className="grid grid-cols-1 gap-4">
             {blogPosts.map((post) => (
               <>
+                {/* @ts-ignore */}
                 <BlogPostCard key={post.id} post={post} />
                 <Separator className="w-full" />
               </>

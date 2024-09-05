@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import { Alert } from "@/components/ui/alert";
 import Link from "next/dist/client/link";
 import { Badge } from "./ui/badge";
+import { Button } from "@/components/ui/button";
 
 type BlogPostProps = {
   post: {
@@ -15,11 +16,12 @@ type BlogPostProps = {
       pubDate: string;
       title: string;
       source: string;
+      id: string;
     };
   };
 };
 
-export default function BlogPostCard({ post }: BlogPostProps) {
+export default async function BlogPostCard({ post }: BlogPostProps) {
   const { fields } = post;
 
   return (
@@ -48,6 +50,13 @@ export default function BlogPostCard({ post }: BlogPostProps) {
         {fields.creator && (
           <p className="text-sm text-muted-foreground">By {fields.creator}</p>
         )}
+        <div className="flex justify-end">
+          <Link href={`/article/${fields.id}`}>
+            <Button variant="outline" className="mt-2">
+              Read AI Summary
+            </Button>
+          </Link>
+        </div>
       </div>
       <div className="hidden sm:block">
         <div className="flex lg:hidden justify-end text-sm text-muted-foreground mb-4 mt-3">
