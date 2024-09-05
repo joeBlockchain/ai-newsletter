@@ -117,3 +117,57 @@ export async function subscribeFormSubmit(email: string) {
     }
   );
 }
+
+// Add this type definition
+export type BlogPost = {
+  id: string;
+  fields: {
+    GUID: string;
+    content: string;
+    creator: string;
+    imgURL: string;
+    link: string;
+    pubDate: string;
+    title: string;
+    source: string;
+    rssID: string;
+  };
+};
+
+// Add this function
+export async function getBlogPosts(): Promise<BlogPost[]> {
+  console.log("Getting blog posts");
+
+  const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
+    "appSMEQ0b0QCb3Gi0"
+  );
+
+  return new Promise((resolve, reject) => {
+    const posts: BlogPost[] = [];
+    base("RSS")
+      .select({
+        pageSize: 12,
+        view: "Grid view",
+        sort: [{ field: "pubDate", direction: "desc" }],
+      })
+      .eachPage(
+        function page(records, fetchNextPage) {
+          records.forEach((record) => {
+            posts.push({
+              id: record.id,
+              fields: record.fields as BlogPost["fields"],
+            });
+          });
+          fetchNextPage();
+        },
+        function done(err) {
+          if (err) {
+            console.error("Error fetching blog posts:", err);
+            reject(err);
+            return;
+          }
+          resolve(posts);
+        }
+      );
+  });
+}

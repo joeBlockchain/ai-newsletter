@@ -4,59 +4,7 @@ import BlogPostCard from "@/components/blog-post-card";
 import { Bird, FileText, Rss, RssIcon, Search } from "lucide-react";
 import SubscribeForm from "@/components/subscribe-form";
 import { Separator } from "@/components/ui/separator";
-
-// Define the type for our blog post
-type BlogPost = {
-  id: string;
-  fields: {
-    GUID: string;
-    content: string;
-    creator: string;
-    imgURL: string;
-    link: string;
-    pubDate: string;
-    title: string;
-    source: string;
-    rssID: string;
-  };
-};
-
-async function getBlogPosts(): Promise<BlogPost[]> {
-  console.log("Getting blog posts");
-
-  const Airtable = require("airtable");
-  const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
-    "appSMEQ0b0QCb3Gi0"
-  );
-
-  return new Promise((resolve, reject) => {
-    const posts: BlogPost[] = [];
-    base("RSS")
-      .select({
-        pageSize: 12,
-        view: "Grid view",
-        sort: [{ field: "pubDate", direction: "desc" }],
-      })
-      .eachPage(
-        function page(records: any, fetchNextPage: any) {
-          records.forEach((record: any) => {
-            posts.push({
-              id: record.id,
-              fields: record.fields,
-            });
-          });
-          fetchNextPage();
-        },
-        function done(err: any) {
-          if (err) {
-            reject(err);
-            return;
-          }
-          resolve(posts);
-        }
-      );
-  });
-}
+import { getBlogPosts, type BlogPost } from "@/lib/actions";
 
 export default async function Home() {
   const blogPosts = await getBlogPosts();
