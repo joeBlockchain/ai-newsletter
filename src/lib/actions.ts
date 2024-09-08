@@ -7,17 +7,20 @@ import { cookies } from "next/headers";
 
 export type AIArticle = {
   id: string;
-  fields: {
-    content: string;
-    contentSnipit: string;
-    createdTime: string;
-    ID: number;
-    lastModified: string;
-    model: string;
-    rssGUID: string;
-    rssID: string;
-    title: string;
-  };
+    rss_feed_id: number; // bigint
+    original_title: string; // text
+    original_link: string; // text
+    guid: string; // text
+    pub_date: string; // timestamp with time zone
+    original_content: string; // text
+    content_snippet: string; // text
+    categories: any; // jsonb
+    iso_date: string; // timestamp with time zone
+    ai_article_id: number; // bigint
+    ai_title: string; // text
+    ai_content: string; // text
+    generated_at: string; // timestamp with time zone
+    img_url?: string; // text
 };
 
 export async function getAIArticleByRSSID(

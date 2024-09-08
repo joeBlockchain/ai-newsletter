@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getAIArticleByRSSID } from "@/lib/actions";
+import { getAIArticleByRSSID, type AIArticle } from "@/lib/actions";
 import ArticlePost from "@/components/article-post";
 import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
@@ -30,7 +30,7 @@ export default async function ArticlePage({
         </Link>
         <div className="flex items-center justify-center">
           <div className="prose dark:prose-invert">
-            <ArticlePost article={aiArticle} />
+            <ArticlePost article={aiArticle as AIArticle} />
           </div>
         </div>
       </div>

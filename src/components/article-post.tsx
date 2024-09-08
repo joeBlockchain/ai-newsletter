@@ -1,20 +1,20 @@
 import { format, parseISO } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-
-type Article = {
-  original_title: string;
-  generated_at: string;
-  ai_content: string;
-  img_url?: string;
-};
+import { type AIArticle } from "@/lib/actions";
 
 type ArticlePostProps = {
-  article: Article;
+  article: AIArticle & { img_url?: string };
 };
 
 export default function ArticlePost({ article }: ArticlePostProps) {
-  const { original_title, generated_at, ai_content, img_url } = article;
+  console.log(article);
+  const {
+    original_title = "",
+    generated_at = "",
+    ai_content = "",
+    img_url,
+  } = article;
 
   // Strip the <article> tags from ai_content
   let strippedContent = ai_content
@@ -37,7 +37,7 @@ export default function ArticlePost({ article }: ArticlePostProps) {
       )}
       {/* <h1 className="text-5xl font-bold">{original_title}</h1> */}
       <p className="text-sm text-muted-foreground">
-        {format(parseISO(generated_at), "MMMM d, yyyy")}
+        {generated_at && format(parseISO(generated_at), "MMMM d, yyyy")}
       </p>
       <div className="prose prose-lg max-w-none dark:prose-invert">
         <ReactMarkdown
