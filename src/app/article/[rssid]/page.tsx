@@ -29,9 +29,7 @@ export default async function ArticlePage({
           </Button>
         </Link>
         <div className="flex items-center justify-center">
-          <div className="prose dark:prose-invert">
-            <ArticlePost article={aiArticle as AIArticle} />
-          </div>
+          <ArticlePost article={aiArticle as AIArticle} />
         </div>
       </div>
       <SiteFooter />

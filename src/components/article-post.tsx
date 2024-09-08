@@ -1,6 +1,7 @@
 import { format, parseISO } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkRehype from "remark-rehype";
 import { type AIArticle } from "@/lib/actions";
 
 type ArticlePostProps = {
@@ -8,7 +9,6 @@ type ArticlePostProps = {
 };
 
 export default function ArticlePost({ article }: ArticlePostProps) {
-  console.log(article);
   const {
     original_title = "",
     generated_at = "",
@@ -20,10 +20,6 @@ export default function ArticlePost({ article }: ArticlePostProps) {
   let strippedContent = ai_content
     ? ai_content.replace(/<\/?article>/g, "").trim()
     : "";
-
-  // Remove the title from the content if it's present
-  const titleRegex = new RegExp(`^#\\s*${original_title}\\s*\n`, "i");
-  strippedContent = strippedContent.replace(titleRegex, "");
 
   return (
     <div className="space-y-4">
@@ -39,9 +35,18 @@ export default function ArticlePost({ article }: ArticlePostProps) {
       <p className="text-sm text-muted-foreground">
         {generated_at && format(parseISO(generated_at), "MMMM d, yyyy")}
       </p>
-      <div className="prose prose-lg max-w-none dark:prose-invert">
+      <div className="prose prose-lg dark:prose-invert">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
+          rehypePlugins={[
+            [
+              remarkRehype,
+              {
+                footnoteBackContent: "↖",
+                footnoteBackLabel: "↖",
+              },
+            ],
+          ]}
           components={{
             a: ({ node, ...props }) => (
               <a {...props} target="_blank" rel="noopener noreferrer" />
