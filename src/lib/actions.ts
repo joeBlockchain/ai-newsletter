@@ -2,6 +2,9 @@
 
 import Airtable from "airtable";
 
+import { createClient } from "@/utils/supabase/server";
+import { cookies } from "next/headers";
+
 export type AIArticle = {
   id: string;
   fields: {
@@ -17,82 +20,35 @@ export type AIArticle = {
   };
 };
 
-export async function getAIArticles(): Promise<AIArticle[]> {
-  console.log("Getting AI articles");
-
-  const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
-    "appSMEQ0b0QCb3Gi0"
-  );
-
-  return new Promise((resolve, reject) => {
-    const articles: AIArticle[] = [];
-    base("aiArticles")
-      .select({
-        pageSize: 12,
-        view: "Grid view",
-        sort: [{ field: "createdTime", direction: "desc" }],
-      })
-      .eachPage(
-        function page(records, fetchNextPage) {
-          records.forEach((record) => {
-            articles.push({
-              id: record.id,
-              fields: record.fields as AIArticle["fields"],
-            });
-          });
-          fetchNextPage();
-        },
-        function done(err) {
-          if (err) {
-            console.error("Error fetching AI articles:", err);
-            reject(err);
-            return;
-          }
-          resolve(articles);
-        }
-      );
-  });
-}
-
 export async function getAIArticleByRSSID(
   rssID: string
-): Promise<AIArticle | null> {
+): Promise<AIArticle & { img_url?: string }> {
   console.log("Getting AI article by RSSID:", rssID);
 
-  const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
-    "appSMEQ0b0QCb3Gi0"
-  );
+  const cookieStore = cookies();
+  const supabase = createClient(cookieStore);
 
-  console.log("RSSID:", rssID);
+  const { data: ai_article } = await supabase
+    .from("article_view")
+    .select()
+    .eq("rss_feed_id", rssID)
+    .single();
 
-  return new Promise((resolve, reject) => {
-    base("aiArticles")
-      .select({
-        filterByFormula: `{rssID} = '${rssID}'`,
-        maxRecords: 1,
-      })
-      .firstPage((err, records) => {
-        if (err) {
-          console.error("Error fetching AI article:", err);
-          reject(err);
-          return;
-        }
-        if (records && records.length > 0) {
-          const article: AIArticle = {
-            id: records[0].id,
-            fields: records[0].fields as AIArticle["fields"],
-          };
-          resolve(article);
-        } else {
-          resolve(null);
-        }
-      });
-  });
+  const { data: data_img_url } = await supabase
+    .from("rss_feed")
+    .select("img_url")
+    .eq("id", rssID)
+    .single();
+
+  console.log(data_img_url);
+
+  return {
+    ...ai_article,
+    img_url: data_img_url?.img_url
+  };
 }
 
 export async function subscribeFormSubmit(email: string) {
-  console.log(email);
-
   var Airtable = require("airtable");
   var base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
     "appSMEQ0b0QCb3Gi0"
@@ -118,56 +74,18 @@ export async function subscribeFormSubmit(email: string) {
   );
 }
 
-// Add this type definition
-export type BlogPost = {
-  id: string;
-  fields: {
-    GUID: string;
-    content: string;
-    creator: string;
-    imgURL: string;
-    link: string;
-    pubDate: string;
-    title: string;
-    source: string;
-    rssID: string;
-  };
-};
-
 // Add this function
-export async function getBlogPosts(): Promise<BlogPost[]> {
+export async function getBlogPosts() {
   console.log("Getting blog posts");
 
-  const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(
-    "appSMEQ0b0QCb3Gi0"
-  );
+  const cookieStore = cookies();
+  const supabase = createClient(cookieStore);
 
-  return new Promise((resolve, reject) => {
-    const posts: BlogPost[] = [];
-    base("RSS")
-      .select({
-        pageSize: 12,
-        view: "Grid view",
-        sort: [{ field: "pubDate", direction: "desc" }],
-      })
-      .eachPage(
-        function page(records, fetchNextPage) {
-          records.forEach((record) => {
-            posts.push({
-              id: record.id,
-              fields: record.fields as BlogPost["fields"],
-            });
-          });
-          fetchNextPage();
-        },
-        function done(err) {
-          if (err) {
-            console.error("Error fetching blog posts:", err);
-            reject(err);
-            return;
-          }
-          resolve(posts);
-        }
-      );
-  });
+  const { data: blog_posts } = await supabase
+    .from("rss_feed")
+    .select()
+    .order("pub_date", { ascending: false })
+    .filter("should_draft_article", "eq", true);
+
+  return blog_posts;
 }

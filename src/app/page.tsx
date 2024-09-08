@@ -4,7 +4,7 @@ import BlogPostCard from "@/components/blog-post-card";
 import { Bird, FileText, Rss, RssIcon, Search } from "lucide-react";
 import SubscribeForm from "@/components/subscribe-form";
 import { Separator } from "@/components/ui/separator";
-import { getBlogPosts, type BlogPost } from "@/lib/actions";
+import { getBlogPosts } from "@/lib/actions";
 
 export default async function Home() {
   const blogPosts = await getBlogPosts();
@@ -27,7 +27,7 @@ export default async function Home() {
         <Separator className="w-full" />
         <section className="flex flex-col w-full items-center px-5 py-[5rem]">
           <div className="grid grid-cols-1 gap-4">
-            {blogPosts.map((post) => (
+            {blogPosts?.map((post) => (
               <>
                 {/* @ts-ignore */}
                 <BlogPostCard key={post.id} post={post} />
