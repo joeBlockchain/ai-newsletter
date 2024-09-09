@@ -37,16 +37,16 @@ export default function ArticlePost({ article }: ArticlePostProps) {
       </p>
       <div className="prose prose-lg dark:prose-invert">
         <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
-          rehypePlugins={[
-            [
-              remarkRehype,
-              {
-                footnoteBackContent: "↖",
-                footnoteBackLabel: "↖",
-              },
-            ],
-          ]}
+          // remarkPlugins={[remarkGfm]}
+          // rehypePlugins={[
+          //   [
+          //     remarkRehype,
+          //     {
+          //       footnoteBackContent: "↖",
+          //       footnoteBackLabel: "↖",
+          //     },
+          //   ],
+          // ]}
           components={{
             a: ({ node, ...props }) => (
               <a {...props} target="_blank" rel="noopener noreferrer" />
