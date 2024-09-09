@@ -4,6 +4,8 @@ import Airtable from "airtable";
 
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
+import { cache } from "react";
+
 
 export type AIArticle = {
   id: string;
@@ -23,9 +25,7 @@ export type AIArticle = {
     img_url?: string; // text
 };
 
-export async function getAIArticleByRSSID(
-  rssID: string
-): Promise<AIArticle & { img_url?: string }> {
+export const getAIArticleByRSSID = cache(async (rssID: string): Promise<AIArticle & { img_url?: string }> => {
   console.log("Getting AI article by RSSID:", rssID);
 
   const cookieStore = cookies();
@@ -49,7 +49,7 @@ export async function getAIArticleByRSSID(
     ...ai_article,
     img_url: data_img_url?.img_url
   };
-}
+});
 
 export async function subscribeFormSubmit(email: string) {
   var Airtable = require("airtable");
@@ -77,8 +77,7 @@ export async function subscribeFormSubmit(email: string) {
   );
 }
 
-// Add this function
-export async function getBlogPosts() {
+export const getBlogPosts = cache(async () => {
   console.log("Getting blog posts");
 
   const cookieStore = cookies();
@@ -91,4 +90,14 @@ export async function getBlogPosts() {
     .filter("should_draft_article", "eq", true);
 
   return blog_posts;
+});
+
+// To use this with revalidation:
+export async function getBlogPostsWithRevalidation(revalidate: number = 60) {
+  const posts = await getBlogPosts();
+  
+  // This line sets up revalidation for this specific data fetch
+  revalidate = revalidate;
+
+  return posts;
 }
