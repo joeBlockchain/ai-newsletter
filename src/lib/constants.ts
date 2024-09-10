@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "AI News on the Cheep | AI-Powered Newsletter",
+  title: "AI News on the Cheep",
   description:
     "Stay informed with our AI-curated newsletter, delivering the latest insights and applications of artificial intelligence across various industries.",
   keywords: [
