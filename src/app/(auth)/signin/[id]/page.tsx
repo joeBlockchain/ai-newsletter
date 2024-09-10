@@ -32,7 +32,7 @@ export default async function SignIn({
   params,
   searchParams,
 }: {
-  params: { id: string };
+  params: { id: number };
   searchParams: { disable_button: boolean };
 }) {
   const { allowOauth, allowEmail, allowPassword } = getAuthTypes();
