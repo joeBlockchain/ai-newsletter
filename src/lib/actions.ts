@@ -8,19 +8,8 @@ import { cookies } from "next/headers";
 export type AIArticle = {
   id: string;
     rss_feed_id: number; // bigint
-    original_title: string; // text
-    original_link: string; // text
-    guid: string; // text
-    pub_date: string; // timestamp with time zone
-    original_content: string; // text
-    content_snippet: string; // text
-    categories: any; // jsonb
-    iso_date: string; // timestamp with time zone
-    ai_article_id: number; // bigint
-    ai_title: string; // text
-    ai_content: string; // text
-    generated_at: string; // timestamp with time zone
-    img_url?: string; // text
+    title: string; // text
+    content: string; // text
 };
 
 export async function getAIArticleByRSSID(
@@ -28,26 +17,25 @@ export async function getAIArticleByRSSID(
 ): Promise<AIArticle & { img_url?: string }> {
   console.log("Getting AI article by RSSID:", rssID);
 
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = createClient();
 
   const { data: ai_article } = await supabase
-    .from("article_view")
+    .from("ai_articles")
     .select()
     .eq("rss_feed_id", rssID)
     .single();
 
   const { data: data_img_url } = await supabase
     .from("rss_feed")
-    .select("img_url")
+    .select("img_url, title, pub_date")
     .eq("id", rssID)
     .single();
 
-  console.log(data_img_url);
-
   return {
     ...ai_article,
-    img_url: data_img_url?.img_url
+    img_url: data_img_url?.img_url ?? "",
+    title: data_img_url?.title ?? "",
+    pub_date: data_img_url?.pub_date ?? ""
   };
 }
 
@@ -81,8 +69,7 @@ export async function subscribeFormSubmit(email: string) {
 export async function getBlogPosts() {
   console.log("Getting blog posts");
 
-  const cookieStore = cookies();
-  const supabase = createClient(cookieStore);
+  const supabase = createClient();
 
   const { data: blog_posts } = await supabase
     .from("rss_feed")

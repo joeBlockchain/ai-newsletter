@@ -3,37 +3,35 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
 import { type AIArticle } from "@/lib/actions";
+import { Separator } from "@radix-ui/react-separator";
 
 type ArticlePostProps = {
-  article: AIArticle & { img_url?: string };
+  article: AIArticle & { img_url?: string; title?: string; pub_date?: string };
 };
 
 export default function ArticlePost({ article }: ArticlePostProps) {
-  const {
-    original_title = "",
-    generated_at = "",
-    ai_content = "",
-    img_url,
-  } = article;
+  const { title = "", pub_date = "", content = "", img_url } = article;
+
+  console.log(article);
 
   // Strip the <article> tags from ai_content
-  let strippedContent = ai_content
-    ? ai_content.replace(/<\/?article>/g, "").trim()
+  let strippedContent = content
+    ? content.replace(/<\/?article>/g, "").trim()
     : "";
 
   return (
     <div className="space-y-4">
+      {/* <h1 className=" text-4xl font-bold max-w-3xl text-center">{title}</h1> */}
       {img_url && (
-        <div className="flex justify-center">
+        <div className="flex justify-center items-center py-5">
           <div
-            className="w-[600px] h-[400px] bg-cover bg-center rounded-md"
+            className="w-[600px] h-[400px] bg-cover bg-center rounded-md justify-center items-center"
             style={{ backgroundImage: `url(${img_url})` }}
           />
         </div>
       )}
-      {/* <h1 className="text-5xl font-bold">{original_title}</h1> */}
       <p className="text-sm text-muted-foreground">
-        {generated_at && format(parseISO(generated_at), "MMMM d, yyyy")}
+        {pub_date && format(parseISO(pub_date), "MMMM d, yyyy")}
       </p>
       <div className="prose prose-lg dark:prose-invert">
         <ReactMarkdown

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Bird } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ModeToggle } from "./mode-toggle";
+import AuthButton from "@/components/auth-button";
 import { metadata } from "@/lib/constants";
 
 export default function SiteHeader() {
@@ -88,7 +88,7 @@ export default function SiteHeader() {
             </div>
             <div className="ml-auto flex gap-2">
               <div className="flex flex-row space-x-4">
-                <ModeToggle />
+                <AuthButton size="small" />
               </div>
             </div>
           </nav>
