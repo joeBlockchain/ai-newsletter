@@ -9,9 +9,9 @@ import { Button } from "@/components/ui/button";
 export default async function ArticlePage({
   params,
 }: {
-  params: { rssid: number };
+  params: { rssid: string };
 }) {
-  const aiArticle = await getAIArticleByRSSID(params.rssid);
+  const aiArticle = await getAIArticleByRSSID(parseInt(params.rssid));
 
   if (!aiArticle) {
     notFound();
