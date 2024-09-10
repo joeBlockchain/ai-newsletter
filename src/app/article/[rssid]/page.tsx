@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 export default async function ArticlePage({
   params,
 }: {
-  params: { rssid: string };
+  params: { rssid: number };
 }) {
   const aiArticle = await getAIArticleByRSSID(params.rssid);
 
