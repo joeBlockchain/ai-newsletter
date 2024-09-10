@@ -3,39 +3,56 @@
 import Airtable from "airtable";
 
 import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
 
 export type AIArticle = {
-  id: string;
-    rss_feed_id: number; // bigint
-    title: string; // text
-    content: string; // text
+  id: number;
+  rss_feed_id: number;
+  title: string;
+  content: string;
+};
+
+export type RSSFeed = {
+  id: number;
+  title: string;
+  link: string;
+  pub_date: string;
+  content: string;
+  content_snippet: string;
+  guid: string;
+  categories: string;
+  img_url: string;
+  source: string;
+  should_draft_article: boolean;
 };
 
 export async function getAIArticleByRSSID(
-  rssID: string
-): Promise<AIArticle & { img_url?: string }> {
+  rssID: number
+): Promise<AIArticle & Partial<RSSFeed>> {
   console.log("Getting AI article by RSSID:", rssID);
 
   const supabase = createClient();
-
-  const { data: ai_article } = await supabase
+  
+  const { data: ai_article, error: ai_error } = await supabase
     .from("ai_articles")
     .select()
     .eq("rss_feed_id", rssID)
     .single();
 
-  const { data: data_img_url } = await supabase
+  if (ai_error) throw ai_error;
+
+  const { data: rss_feed, error: rss_error } = await supabase
     .from("rss_feed")
     .select("img_url, title, pub_date")
     .eq("id", rssID)
     .single();
 
+  if (rss_error) throw rss_error;
+
   return {
     ...ai_article,
-    img_url: data_img_url?.img_url ?? "",
-    title: data_img_url?.title ?? "",
-    pub_date: data_img_url?.pub_date ?? ""
+    img_url: rss_feed?.img_url ?? "",
+    title: rss_feed?.title ?? ai_article.title,
+    pub_date: rss_feed?.pub_date ?? ""
   };
 }
 
@@ -66,16 +83,18 @@ export async function subscribeFormSubmit(email: string) {
 }
 
 // Add this function
-export async function getBlogPosts() {
+export async function getBlogPosts(): Promise<RSSFeed[]> {
   console.log("Getting blog posts");
 
   const supabase = createClient();
 
-  const { data: blog_posts } = await supabase
+  const { data: blog_posts, error } = await supabase
     .from("rss_feed")
     .select()
     .order("pub_date", { ascending: false })
     .filter("should_draft_article", "eq", true);
 
-  return blog_posts;
+  if (error) throw error;
+
+  return blog_posts as RSSFeed[];
 }
