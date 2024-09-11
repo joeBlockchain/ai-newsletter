@@ -83,18 +83,31 @@ export async function subscribeFormSubmit(email: string) {
 }
 
 // Add this function
-export async function getBlogPosts(): Promise<RSSFeed[]> {
-  console.log("Getting blog posts");
+export async function getBlogPosts(page: number = 1, pageSize: number = 10): Promise<{ posts: RSSFeed[], total: number }> {
+  console.log("Getting blog posts for page:", page);
 
   const supabase = createClient();
 
-  const { data: blog_posts, error } = await supabase
+  // Calculate the range for pagination
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  const { data: blog_posts, error, count } = await supabase
     .from("rss_feed")
-    .select()
+    .select("*", { count: 'exact' })
     .order("pub_date", { ascending: false })
-    .filter("should_draft_article", "eq", true);
+    .filter("should_draft_article", "eq", true)
+    .range(from, to);
 
-  if (error) throw error;
+  if (error) {
+    console.error("Error fetching blog posts:", error);
+    throw error;
+  }
 
-  return blog_posts as RSSFeed[];
+  console.log("Fetched posts:", blog_posts?.length, "Total:", count);
+
+  return { 
+    posts: blog_posts as RSSFeed[] || [], 
+    total: count ?? 0 
+  };
 }

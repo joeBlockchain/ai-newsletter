@@ -1,16 +1,27 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getAIArticleByRSSID, type AIArticle } from "@/lib/actions";
 import ArticlePost from "@/components/article-post";
 import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
+import { createClient } from "@/utils/supabase/server";
 
 export default async function ArticlePage({
   params,
 }: {
   params: { rssid: string };
 }) {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/signin");
+  }
+
   const aiArticle = await getAIArticleByRSSID(parseInt(params.rssid));
 
   if (!aiArticle) {

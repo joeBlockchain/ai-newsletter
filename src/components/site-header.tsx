@@ -15,16 +15,16 @@ export default function SiteHeader() {
           prefetch={false}
         >
           <Bird className="h-6 w-6 text-muted-foreground md:text-primary" />
-          <span className="ml-4 font-semibold text-base sm:text-lg ">
+          {/* <span className="ml-4 font-semibold text-base sm:text-lg ">
             {title}
-          </span>
+          </span> */}
         </Link>
         <div className="flex flex-1 items-center space-x-2 justify-end">
           <nav className="flex items-center gap-2 ">
             <div className="hidden sm:block space-x-2 md:space-x-2">
               <Button asChild variant="ghost" size="icon" className="h-9 w-9">
                 <Link
-                  href="https://github.com/joeBlockchain"
+                  href="https://github.com/joeBlockchain/ai-newsletter"
                   prefetch={false}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -66,7 +66,7 @@ export default function SiteHeader() {
               </Button>
               <Button asChild variant="ghost" size="icon" className="h-9 w-9">
                 <Link
-                  href="https://medium.com/@learningsomethingnew"
+                  href="https://medium.com/@learningsomethingnew/building-an-ai-powered-news-aggregator-my-first-n8n-workflow-40cf3753a387"
                   prefetch={false}
                   target="_blank"
                   rel="noopener noreferrer"
